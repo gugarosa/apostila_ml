@@ -1,0 +1,158 @@
+\section{Máquinas de Vetores de Suporte}
+\label{s.svm}
+
+Com o intuito de obter os principais conceitos sobre as Máquinas de Vetores de Suporte (SVMs), podemos observar primeiramente o classificador de Regressão Logística, o qual será modificado para suprir nossas necessidades.
+
+Novamente, temos a seguinte equação para descrever o classificador de Regressão Logística:
+
+\begin{center}
+$h_w(x)=\frac{1}{1+e^{-w^Tx}}$	
+\end{center}
+
+Se $(y = 1)$, queremos que $h_w(x) \approx 1 \Rightarrow w^Tx >> 0$.
+Se $(y = 0)$, queremos que $h_w(x) \approx 0 \Rightarrow w^Tx << 0$.\\
+
+Considerando a função de custo da Regressão Logística que já sabemos:
+
+\begin{equation}
+custo(h_w(x)) y = -(y log(h_w(x)) + (1-y)log(1-h_w(x))
+\end{equation}
+\begin{center}
+$= -(y log \frac{1}{1+e^{-w^Tx}} + (1-y) log (1- \frac{1}{1+e^{-w^Tx}})$.
+\end{center}
+
+Note que a função de custo acima considera apenas uma amostra de treinamento. Olhemos a função de custo geral do classificador de Regressão Logística:
+
+\begin{equation}
+\label{e.svm_cost}
+min_w \frac{1}{m} [\sum\limits_{i=1}^m y_i (-log(h_w(x_i)) + (1-y_i)(-log(1-h_w(x_i)))] + \frac{\lambda}{2m} \sum\limits_{j=1}^n w_j^2,
+\end{equation}
+
+a qual é basicamente a Equação~\ref{e.nn_costfunction}, mas com um sinal de ``$-$" dentro de cada termo.
+
+Podemos reescrever a Equação~\ref{e.svm_cost} como segue:
+
+\begin{equation}
+\label{e.svm_newcost}
+min_w \frac{1}{m}[\sum\limits_{i=1}^m y_i custo_1(w^Tx) + (1-y_i)custo_o(w^Tx)] + \frac{\lambda}{2m} \sum\limits_{j=1}^n w_j^2
+\end{equation}
+
+Entretanto, para considerar a formulação do SVM, é necessário reescrever a Equação~\ref{e.svm_newcost} como segue:
+
+\begin{enumerate}
+\item Vamos remover a constante $\frac{1}{m}$:\\
+$min_w [\sum\limits_{i=1}^m y_i custo_1(w^Tx) + (1-y_i)custo_o(w^Tx)] + \frac{\lambda}{2m} \sum\limits_{j=1}^n w_j^2$
+\item Agora, retiremos o termo de regularização na segunda parte da Equação~\ref{e.svm_newcost}, e adicionemos ao primeiro termo, o qual é nomeado agora de $C$. A otimização é mantida similar se $C = \frac{1}{\lambda}$. Portanto, temos a seguinte função de custo geral considerando SVM:
+
+\begin{equation}
+\label{e.svm_c}
+min_w C \sum\limits_{i=1}^m[y_i custo_1(w^Tx) + (1-y_i)custo_0(w^Tx)]+\frac{1}{2} \sum\limits_{j=1}^n w_j^2
+\end{equation}
+
+Note que as SVMs não retornam as probabilidades como a Regressão Logística faz, mas retorna a classe $h_w(x) \in \{0, 1\}$ para uma dada amostra $x$:
+
+\begin{equation}
+\label{e.svm_classes}
+h_w(x) =
+   \begin{cases}
+      1, & \text{se}\ w^Tx \geq 0 \\
+      0, & \text{caso contrário}.
+    \end{cases}
+\end{equation}
+
+Basicamente, a ideia agora é aprender $w$.
+\end{enumerate}
+
+Quando $C$ for muito grande, o primeiro termo da Equação~\ref{e.svm_c} tende a 0. Neste contexto, temos algo parecido com isso:
+
+\begin{equation}
+\label{e.svm_c_zero}
+min \quad C \times 0 + \frac{1}{2}\sum\limits_{j=1}^n w_j^2
+\end{equation}
+\begin{center}
+sujeito à $w^Tx_i >> 1$ se $(y_i = 1)$ ou $w^Tx_i << -1$ se $(y_i = 0)$.
+\end{center}
+
+Novamente, o problema de otimização refere-se à procura de parâmetros do hiperplano que melhor separam os dados. Portanto, as SVMs tentam encontrar o hiperplano com a margem \textbf{máxima}.\\
+
+\textbf{Relembrando:}\\
+
+$w^Tx = p \parallel w \parallel$, onde $p$ é o tamanho da projeção de $x$ em $w$. Sabemos que $\parallel w \parallel = \sqrt{\sum\limits_{j=1}^n w_j^2}$, a qual é a norma do vetor $w$. Podemos reescrever a Equação~\ref{e.svm_c_zero} como segue:
+
+\begin{equation}
+\label{e.svm_min}
+min_w \quad \frac{1}{2} \parallel w \parallel^2
+\end{equation}
+\begin{center}
+sujeito à $w^Tx_i >> 1$ se $(y_i = 1)$ ou $w^Tx_i << -1$ se $(y_i = 0)$.
+\end{center}
+
+Portanto, temos que $w^Tx_i = p_i \parallel w \parallel$. Podemos modificar a Equação~\ref{e.svm_min} como segue:
+
+\begin{equation}
+min_w \quad \frac{1}{2} \parallel w \parallel^2	
+\end{equation}
+\begin{center}
+sujeito à $p_i \parallel w \parallel >> 1$ se $(y_i = 1)$ ou $p_i \parallel w \parallel << -1$ se $(y_i = 0)$.
+\end{center}
+
+A probabilidade $1$ leva à $\sum\limits_{i=1}^m p_i$ menor que a mesma soma considerando a possibilidade  $2$. Se $\sum\limits_{i=1}^m p_i$ for muito grande, $w$ necessita ser pequeno (lembre-se que estamos tentando minimizar $w$).
+
+\subsection{Trabalhando com Núcleos}
+\label{ss.svm_kernels}
+
+Suponha que possamos representar o limite de decisão como segue:
+
+\begin{equation}
+\label{e.boundary_limit}
+h_w(x) = w_0 + w_1l_1 + w_2l_2 + \dots\text{, onde } h_1 = x_1, h_2 = x_2, \dots
+\end{equation}
+
+A questão é: podemos encontrar melhores calores para $l_1, l_2, \dots$ de tal modo que o limite de decisão seja menos complexo? Suponha que tenhamos três marcações no espaço de características, por exemplo, $l_1, l_2$ e $l_3$. 
+
+Para uma dada amostra $x$, podemos definir:
+
+\begin{center}
+$l_1 = similaridade(x,l_1) = exp(\frac{-\parallel x - l_1 \parallel}{2\sigma^2})$ \\	
+$l_2 = similaridade(x,l_2) = exp(\frac{-\parallel x - l_2 \parallel}{2\sigma^2})$ \\	
+$l_3 = similaridade(x,l_3) = exp(\frac{-\parallel x - l_3 \parallel}{2\sigma^2})$ \\	
+\end{center}
+
+Está função $K(x, l_i)$ é chamada de função do núcleo, ativada por uma função de base radial do tipo gaussiana. \\
+
+\noindent Se $x \approx l_1 \Rightarrow l_1 = exp(\frac{-0}{2\sigma^2}) = 1$.
+\\
+Se $x$ estiver distante de $l_1 \Rightarrow l_1 = exp(\frac{-\infty}{2\sigma^2}) = 0$. \\
+
+Novamente, suponha que tenhamos $y = 1$ quando $w_0 + w_1l_1 + w_2l_2 + w_3l_3 \geq 0$. Seja $w^T = [=0.5 \ 1 \ 1 \ 0]$, e considere duas amostras como $x_1$ e $x_2$:
+
+\begin{itemize}
+\item Para $x_1$: $l_1 \approx 1, l_2 \approx 0, l_3 \approx 0 \Rightarrow w_0 + w_1l_1 + w_2l_2 + w_3l_3 = 0.5 + 1 = 0.5 > 0$.
+\item Para $x_2$: $l_1 \approx 0, l_2 \approx 0, l_3 \approx 0 \Rightarrow w_0 + w_1l_1 + w_2l_2 + w_3l_3 = 0.5 < 0$.
+\end{itemize}
+  
+Basicamente, também vamos terminar com uma função de decisão complexa.
+
+A principal ideia é escolher cada exemplo de treinamento como uma marcação. Portanto, se tivermos $m$ exemplos, deveremos ter $l_i = x_i, x = 1, 2, \dots, m$.
+
+Então, dado uma exemplo $x$:
+
+\begin{center}
+$f_i = similaridade(x, l_i) \Rightarrow f^T = [f_0 \ f_1 \ \dots f_m]$.	
+\end{center}
+
+Portanto, $x_i \in \mathbb{R}^{m+1}$ será representado como $f^i = [f_0^i \ f_1^i \dots f_m^i] \ in \mathbb{R}^{m+1}$.
+
+Em suma, considerando SVM com núcleos, temos:
+
+\begin{itemize}
+\item Hipótese: dado $x$, calcula características $f \in \mathbb{R}^{m+1}$. Predizer $y = 1$ se $w^Tf \geq 0$.
+\end{itemize}
+
+A etapa de treinamento consiste em solucionar o seguinte problema de minimização.
+
+\begin{equation}
+min_w \ C \sum\limits_{i=1}^m y_i \ custo_1 (w^Tf^i) + (1 - y_i) \ custo_0 (w^Tf^i) + \frac{1}{2} \sum\limits_{j=1}^m w_j^2
+\end{equation}
+
+O principal problema é escolher o parâmetro $C$, bem como os parâmetros do núcleo.

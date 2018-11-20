@@ -1,0 +1,45 @@
+\section{Aprendizado Não-Supervisionado}
+\label{s.unsupervised_learning}
+
+Vimos nas aulas anteriores que, dado um conjunto de treinamento rotulado $X = \{(x_1, y_1), (x_2, y_2), \dots, (x_m, y_m)\}$, um algoritmo de aprendizado supervisionado tem por objetivo aprender um limite de decisão o qual melhor separa as amostras de diferentes classes.
+
+Basicamente, a ideia principal é alimentar o algoritmo não-supervisionado com dados, com o intuito de encontrar padrões. Portanto, nossa base de dados é modelada como $X = \{x_1, x_2, \dots, x_m\}$. Como a ideia é encontrar agrupamentos contidos nos dados, as técnicas não-supervisionadas geralmente são denominadas de agrupamentos.
+
+\subsection{K-médias}
+\label{ss.kmeans}
+
+O algoritmo do k-médias é um dos mais utilizados para a classificação não-supervisionada. Ele possui duas etapas principais:
+
+\begin{itemize}
+\item atribuição dos agrupamentos;
+\item atualização dos centros.	
+\end{itemize}
+
+Basicamente, utilizando o número de agrupamentos (médias) como uma entrada ($k$), escolhemos aleatoriamente $k$ amostras. Após, cada amostra do conjunto de dados é associada ao seu vizinho mais próximo. Adicionalmente, podemos computar os novos centros baseados nos valores médios da amostra que pertence a cada agrupamento. O algoritmo termina de iterar quando os novos centros não mudam suas posições durante as iterações.
+
+Quando os agrupamentos estão bem-separados, o algoritmo do k-médias deve funcionar muito bem. A maioria dos algoritmos supervisionados vistos são modelados por uma função a ser otimizada, assim como no caso do k-médias.
+
+Seja $k$ o número de agrupamentos, $c_i$ o número do agrupamento para o qual $x_i$ foi atribuído, $\mu_k$ o centro do agrupamento $(x, \mu_k \in \mathbb{R}^n)$, e $\mu_{c_i}$ o centro do agrupamento para o qual $x_i$ foi atribuído. A função de otimização é dada por:
+
+\begin{equation}
+\label{e.kmeans_optimization}
+J(c_1, c_2, \dots, c_m, \mu_1, \mu_2, \dots, \mu_k) = \frac{1}{m} \sum\limits_{i=1}^m \parallel x_i - \mu_{c_i} \parallel.	
+\end{equation}
+
+Portanto, a ideia é solucionar o seguinte problema:
+
+\begin{equation}
+min \ J(c_1, c_2, \dots, c_m, \mu_1, \mu_2, \dots, \mu_k).	
+\end{equation}
+
+O k-médias pode ser implementado como segue:\\
+
+ \noindent inicialize aleatoriamente $k$ centros de agrupamentos $\mu_1, \mu_2, \dots, \mu_k \in \mathbb{R}^n$\\~\\
+ repita até convergência\{ \\ \\
+ \hspace*{25pt} para $i = 1$ até $n$\\~\\
+ \hspace*{35pt} $c_i \leftarrow index \in \{1, 2, \dots, k\}$ do centro do agrupamento mais perto de $k_i$\\~\\
+  \hspace*{25pt} para $i = 1$ até $k$\\~\\
+  \hspace*{35pt} $u_i \leftarrow$ média de todos os pontos atribuídos ao agrupamento $i$\\ \\
+ \hspace*{15pt} \} \\
+
+
